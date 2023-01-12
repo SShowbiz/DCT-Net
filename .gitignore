@@ -187,7 +187,7 @@ poetry.toml
 .history
 .ionide
 
-# Custom
+# repository
 datasets/
 pretrain_models/
 test_datasets/
@@ -195,4 +195,16 @@ ttn_datasets/
 weights/
 checkpoint_landmark_19116.pth.tar
 lbpcascade_animeface.xml
+
+# nohup
+nohup.out
+
+# images
+*.png
+*.gif
+*.jpg
+*.jpeg
+
+## SSFHS
+.DS_Store
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,python
