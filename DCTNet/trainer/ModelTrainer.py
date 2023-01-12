@@ -31,8 +31,6 @@ class ModelTrainer:
     # ## ===== ===== ===== ===== =====
 
     def train_network(self,train_loader,test_loader):
-        print('checkpoint 3')
-
         counter = 0
         loss_dict = {}
         acc_num = 0
@@ -41,8 +39,6 @@ class ModelTrainer:
         steps = 0
         begin_it = 0
         if self.args.pretrain_path:
-            print('checkpoint 4')
-
             begin_it = int(self.args.pretrain_path.split('/')[-1].split('-')[0])
             steps = (begin_it+1) * math.ceil(self.args.mx_data_length/self.args.batch_size)
                
@@ -51,8 +47,6 @@ class ModelTrainer:
         for epoch in range(begin_it+1,self.args.max_epoch):
 
             for ii,(data) in enumerate(train_loader):
-                print('checkpoint 5')
-
                 tstart = time.time()
                 
                 self.run_single_step(data,steps)

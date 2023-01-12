@@ -46,11 +46,9 @@ parser.add_argument(
             default=0,
             help='Local rank passed from distributed launcher'
 )
-
 args = parser.parse_args()
 
 def train_net(args):
-    print('checkpoint 1')
     train_loader,test_loader,mx_length = get_data_loader(args)
         
     args.mx_data_length = mx_length
@@ -59,7 +57,6 @@ def train_net(args):
     if args.model == 'ttn':
         trainer = TTNTrainer(args)
 
-    print('checkpoint 2')
     trainer.train_network(train_loader,test_loader)
 
 if __name__ == "__main__":
