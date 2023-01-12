@@ -2,9 +2,11 @@ class Params:
     def __init__(self):
         
         self.name = 'StyleGAN'
+        self.network_name = 'CCN'
+
         self.size = 256 
         self.stylegan_path = 'pretrain_models/550000.pt'
-        self.root = 'datasets/limjukyung_256'
+        self.root = 'datasets/arcane_256'
         self.id_model = 'pretrain_models/model_ir_se50.pth'
         self.g_reg_every = 4 
         self.d_reg_every = 16
@@ -28,3 +30,4 @@ class Params:
 
         self.infer_batch_size = 1
         self.mx_gen_iters = 10000
+        self.wandb_project_name = 'Webtoonme (DCT-Net)'

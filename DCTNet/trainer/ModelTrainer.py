@@ -25,6 +25,7 @@ class ModelTrainer:
 
             if args.eval:
                 self.val_vis = Visualizer(args,"val")
+        self.network_name = args.network_name
 
     # ## ===== ===== ===== ===== =====
     # ## Train network
@@ -82,7 +83,7 @@ class ModelTrainer:
                     
                     display_data = self.select_img(self.get_latest_generated())
 
-                    self.vis.display_current_results(display_data,steps)
+                    self.vis.display_current_results(display_data, steps, mode=f'{self.network_name}_TRAIN', labels=['DATA', 'FAKE_S', 'FAKE_T'])
             
 
 
@@ -159,18 +160,9 @@ class ModelTrainer:
         self.run_discriminator_one_step(data,steps)
         self.run_generator_one_step(data,steps)
 
-    def select_img(self,data,name='fake'):
-        if data is None:
-            return None
-        cat_img = []
-        for v in data: 
-            cat_img.append(v.detach().cpu())
-        
-        cat_img = torch.cat(cat_img,-1)
-        cat_img = torch.cat(torch.split(cat_img,1,dim=0),2)[0]
-       
-        return {name:convert_img(cat_img)}
-
+    def select_img(self, data, name='fake'):
+        images = torch.stack([images.detach().cpu() for images in data], dim=1)
+        return images
 
 
     ##################################################################

@@ -185,7 +185,7 @@ class TTNTrainer(ModelTrainer):
                     loss_dict[k] = loss_dict.get(k,0) + v.detach()
                 if i == index and self.args.rank == 0 :
                     
-                    self.val_vis.display_current_results(self.select_img([xs,xg,xt]),steps)
+                    self.val_vis.display_current_results(self.select_img([xs,xg,xt]), steps, mode=f'{self.network_name}_EVAL', labels=['FAKE_S', 'FAKE_T'])
                 counter += 1
         
        

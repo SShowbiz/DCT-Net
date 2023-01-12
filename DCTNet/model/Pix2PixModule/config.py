@@ -2,6 +2,7 @@ class Params:
     def __init__(self):
        
         self.name = 'Pix2Pix'
+        self.network_name = 'TTN'
     
         self.pretrain_path = None
         self.vgg_model = 'pretrain_models/vgg19-dcbb9e9d.pth'
@@ -24,4 +25,5 @@ class Params:
         self.score_info = 'pretrain_models/all_express_mean.npy'
 
         self.infer_batch_size = 2
+        self.wandb_project_name = 'Webtoonme (DCT-Net)'
 

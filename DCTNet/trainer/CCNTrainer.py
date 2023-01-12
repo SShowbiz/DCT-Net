@@ -200,7 +200,7 @@ class CCNTrainer(ModelTrainer):
             fake_s,_ = self.netGs([self.sample_z])
             fake_t,_ = self.gt_ema([self.sample_z])
         if  self.args.rank == 0 :
-                self.val_vis.display_current_results(self.select_img([fake_s,fake_t]),steps)
+                self.val_vis.display_current_results(self.select_img([fake_s, fake_t]), steps, mode=f'{self.network_name}_EVAL', labels=['FAKE_S', 'FAKE_T'])
                 #  self.val_vis.display_current_results(self.select_img([fake_t]),steps)
         
         return loss_dict

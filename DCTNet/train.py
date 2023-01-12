@@ -38,7 +38,10 @@ parser.add_argument('--checkpoint_path',default='checkpoint-onlybaby',type=str)
 parser.add_argument('--pretrain_path',default=None,type=str)
 
 # ------optimizer set--------------------------------------
-parser.add_argument('--lr',default=0.002,type=float,help="Learning rate")
+parser.add_argument('--lr',default=0.002,type=float,help="learning rate")
+
+# ------logger set--------------------------------------
+parser.add_argument('--task_name', default="", help="wandb task name")
 
 parser.add_argument(
             '--local_rank',

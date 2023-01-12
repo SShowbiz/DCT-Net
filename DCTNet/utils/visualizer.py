@@ -7,9 +7,7 @@ import os
 import time 
 import subprocess
 
-from tensorboardX import SummaryWriter
-
-
+import wandb
 
 class Visualizer:
     def __init__(self,opt,mode='train'):
@@ -22,7 +20,8 @@ class Visualizer:
             if not os.path.exists(self.train_log_dir):
                 os.makedirs(self.train_log_dir)
 
-            self.train_writer = SummaryWriter(self.train_log_dir)
+            wandb.init(project=opt.wandb_project_name, name=opt.task_name, dir=self.train_log_dir)
+            wandb.config.update(opt)
 
             self.log_file = open(self.log_name,"a")
             now = time.strftime("%c")
@@ -32,12 +31,7 @@ class Visualizer:
 
     # errors:dictionary of error labels and values
     def plot_current_errors(self,errors,step):
-
-        for tag,value in errors.items():
-            
-            self.train_writer.add_scalar("%s/"%self.name+tag,value,step)
-            self.train_writer.flush()
-
+        wandb.log(errors)
 
     # errors: same format as |errors| of CurrentErrors
     def print_current_errors(self,epoch,i,errors,t):
@@ -51,15 +45,12 @@ class Visualizer:
         self.log_file.write('%s\n' % message)
         self.log_file.flush()
 
-    def display_current_results(self, visuals, step):
+    def display_current_results(self, visuals, step, mode, labels):
         if visuals is None:
             return 
-        for label, image in visuals.items():
-            # Write the image to a string
-    
-            self.train_writer.add_image("%s/"%self.name+label,image,global_step=step)
+        visual, *_ = visuals
+        vis_images = [wandb.Image(images, caption=f"{self.name} {label}") for images, label in zip(visual, labels)]
+        wandb.log({mode: vis_images})
 
     def close(self):
-        
-        self.train_writer.close()
         self.log_file.close()   
