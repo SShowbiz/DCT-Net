@@ -28,6 +28,7 @@ class ModelTrainer:
             if args.eval:
                 self.val_vis = Visualizer(args,"val")
         self.network_name = args.network_name
+        self.labels =  dict(CCN=['DATA', 'FAKE_S', 'FAKE_T'], TTN=['SOURCE', 'GENERATED', 'TARGET'])[args.network_name]
 
     # ## ===== ===== ===== ===== =====
     # ## Train network
@@ -87,7 +88,7 @@ class ModelTrainer:
                     
                     display_data = self.select_img(self.get_latest_generated())
 
-                    self.vis.display_current_results(display_data, steps, mode=f'{self.network_name}_TRAIN', labels=['DATA', 'FAKE_S', 'FAKE_T'])
+                    self.vis.display_current_results(display_data, steps, mode=f'{self.network_name}_TRAIN', labels=self.labels)
             
 
 
