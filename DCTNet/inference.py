@@ -8,7 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--epoch', default="1")
-parser.add_argument('--img_path', default="test_datasets/test01.png")
+parser.add_argument('--img_path', default="webtoonme_sample")
 
 
 class Infer:
@@ -50,17 +50,21 @@ class Infer:
 if __name__ == "__main__":
     args = parser.parse_args()
     # path = 'pretrain_models/final.pth'
-    img_name = args.img_path.split('/')[-1].split('.')[0]
-    path = f'checkpoints/TTN/arcane_checkpoint/Pix2Pix/{args.epoch.zfill(3)}-00000000.pth'
-    model = Infer(path)
+    images = os.listdir(args.img_path)
+    for image_name in images:
+        img_name = image_name.split('/')[-1].split('.')[0]
+        image_path = os.path.join(args.img_path, image_name)
 
-    img = cv2.imread(args.img_path)
+        path = f'checkpoints/TTN/limjukyung_siggraph_checkpoint/Pix2Pix/{args.epoch.zfill(3)}-00000000.pth'
+        model = Infer(path)
 
-    img_h,img_w,_ = img.shape 
-    n_h,n_w = img_h // 8 * 8,img_w // 8 * 8
-    img = cv2.resize(img,(n_w,n_h))
+        img = cv2.imread(image_path)
 
-    oup = model.run(img)
-    cv2.imwrite(f'{img_name}_output.png',oup)
+        img_h,img_w,_ = img.shape 
+        n_h,n_w = img_h // 8 * 8,img_w // 8 * 8
+        img = cv2.resize(img,(n_w,n_h))
+
+        oup = model.run(img)
+        cv2.imwrite(f'{img_name}_output.png',oup)
      
 
