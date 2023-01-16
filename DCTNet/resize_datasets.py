@@ -8,7 +8,7 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_dir', default="datasets/arcane/")
 parser.add_argument('--save_dir', default="datasets/arcane_256/")
-parser.add_argument('--size', default=256)
+parser.add_argument('--size', default=256, type=int)
 
 
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
     
-    resize = T.Resize(args.size)
+    resize = T.Resize(args.size, interpolation=T.InterpolationMode.BICUBIC)
     images = os.listdir(args.dataset_dir)
     for image_name in images:
         image_path = os.path.join(args.dataset_dir, image_name)
