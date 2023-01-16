@@ -6,7 +6,7 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 import os 
 import time 
 import subprocess
-
+import random
 import wandb
 
 class Visualizer:
@@ -47,9 +47,15 @@ class Visualizer:
 
     def display_current_results(self, visuals, step, mode, labels):
         if visuals is None:
-            return 
-        visual, *_ = visuals
-        vis_images = [wandb.Image(images, caption=f"{self.name} {label}") for images, label in zip(visual, labels)]
+            return
+
+        assert mode.endswith('TRAIN') or mode.endswith('EVAL')
+        if mode.endswith('TRAIN'):
+            visual = visuals[random.randrange(0,len(visuals))]
+            vis_images = [wandb.Image(images, caption=f"{self.name} {label}") for images, label in zip(visual, labels)]
+        elif mode.endswith('EVAL'):
+            vis_images = [wandb.Image(images, caption=' / '.join(labels)) for images in visuals]
+
         wandb.log({mode: vis_images})
 
     def close(self):
