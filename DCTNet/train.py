@@ -33,6 +33,10 @@ parser.add_argument('--mx_data_length',default=100,type=int,help='max data lengt
 parser.add_argument('--max_epoch',default=10000,type=int)
 parser.add_argument('--early_stop',action="store_true",help='')
 parser.add_argument('--scratch',action="store_true",help='')
+parser.add_argument('--train_tgt_root', help='TTN target domain train dataset directory')
+parser.add_argument('--val_tgt_root', help='TTN target domain validation dataset directory')
+
+
 #---------path set--------------------------------------
 parser.add_argument('--checkpoint_path',default='checkpoint-onlybaby',type=str)
 parser.add_argument('--pretrain_path',default=None,type=str)

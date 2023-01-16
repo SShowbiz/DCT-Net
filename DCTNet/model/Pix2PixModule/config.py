@@ -18,10 +18,8 @@ class Params:
        
         self.lambda_exp = 1.0
        
-        self.train_src_root = 'img_ffhq'
-        self.train_tgt_root = 'ttn_datasets/arcane'
-        self.val_src_root = 'img_ffhq_val'
-        self.val_tgt_root = 'ttn_datasets/arcane_val'
+        self.train_src_root = 'datasets/img_ffhq'
+        self.val_src_root = 'datasets/img_ffhq_val'
         self.score_info = 'pretrain_models/all_express_mean.npy'
 
         self.infer_batch_size = 2
