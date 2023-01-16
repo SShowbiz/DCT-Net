@@ -4,9 +4,8 @@ class Params:
         self.name = 'StyleGAN'
         self.network_name = 'CCN'
 
-        self.size = 256 
-        self.stylegan_path = 'pretrain_models/550000.pt'
-        self.root = 'datasets/arcane_256'
+        self.stylegan_path = 'pretrain_models/stylegan2-ffhq-config-f.pt'
+        self.root = 'datasets/limjukyung_aligned'
         self.id_model = 'pretrain_models/model_ir_se50.pth'
         self.g_reg_every = 4 
         self.d_reg_every = 16
@@ -14,7 +13,7 @@ class Params:
         self.latent = 512
         self.n_mlp =8
         self.channel_multiplier =2
-        self.size =256
+        self.size =1024
         self.mixing =0.9
         self.inject_index =4
         self.n_sample =8

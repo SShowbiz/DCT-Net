@@ -82,9 +82,10 @@ class CCNTrainer(ModelTrainer):
                     lr=self.args.lr * self.d_reg_ratio,
                     betas=(0 ** self.d_reg_ratio, 0.99 ** self.d_reg_ratio),
                     )
-        if self.ckpt is not None:
+        if self.ckpt is not None and self.ckpt.get('g_optim') and self.ckpt.get('d_optim'):
             g_optim.load_state_dict(self.ckpt["g_optim"])
             d_optim.load_state_dict(self.ckpt["d_optim"])
+
         return  g_optim,d_optim
 
     
