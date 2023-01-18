@@ -33,10 +33,18 @@ class Process:
 
         self.loadparams(model_path)
 
+        self.truncation = self.args.truncation
+        
+        if self.args.truncation < 1:
+            with torch.no_grad():
+                self.mean_latent = self.netGt.mean_latent(self.args.numvec_for_truncation)
+        else:
+            self.mean_latent = None
+        
         self.netGs.eval()
         self.netGt.eval()
 
-    def __call__(self,save_base):
+    def __call__(self, save_base):
         os.makedirs(save_base,exist_ok=True)
         steps = 0
         for i in range(self.args.mx_gen_iters):
@@ -53,11 +61,12 @@ class Process:
         with torch.no_grad():
             latent_s = self.netGs(noise,only_latent=True)
             latent_t = self.netGt(noise,only_latent=True)
+
             # fake_s,latent_s = self.netGs(noise,return_latents=True)
             # fake_t,latent_t = self.netGt(noise,return_latents=True)
             # mix 
             latent_mix = torch.cat([latent_s[:,:self.args.inject_index],latent_t[:,self.args.inject_index:]],1)
-            fake,_ = self.netGt([latent_mix],input_is_latent=True)
+            fake,_ = self.netGt([latent_mix], input_is_latent=True, truncation=self.truncation, truncation_latent=self.mean_latent)
             # fake = torch.cat([fake_s,fake_t,fake],-1)
             fake = convert_img(fake,unit=True).permute(0,2,3,1)
             return fake.cpu().numpy()[...,::-1]

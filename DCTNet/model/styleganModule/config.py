@@ -30,3 +30,6 @@ class Params:
         self.infer_batch_size = 1
         self.mx_gen_iters = 10000
         self.wandb_project_name = 'Webtoonme (DCT-Net)'
+
+        self.truncation = 0.5
+        self.numvec_for_truncation = 4096
