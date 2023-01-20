@@ -6,13 +6,16 @@ import numpy as np
 import scipy.ndimage
 import PIL.Image
 import face_alignment
+from warp import compute_h_norm
+import torch
 from PIL import Image, ImageDraw
+import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_dir', default="datasets/arcane/")
 parser.add_argument('--save_dir', default="datasets/arcane_256/")
 
-def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_size=1024, enable_padding=True):
+def image_align(src_file, dst_file, face_landmarks, output_size=1024, transform_size=1024, enable_padding=True):
         # Align function from FFHQ dataset pre-processing step
         # https://github.com/NVlabs/ffhq-dataset/blob/master/download_ffhq.py
 
@@ -54,26 +57,29 @@ def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_s
 
         draw = ImageDraw.Draw(img)
 
-        for landmark in lm[36 : 48, :2]:
-            landmark_x, landmark_y = landmark
-            draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(255, 0, 0))
+        # for landmark in lm[36 : 48, :2]:
+        #     landmark_x, landmark_y = landmark
+        #     draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(255, 0, 0))
         
-        for landmark in lm[27 : 36, :2]:
-            landmark_x, landmark_y = landmark
-            draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(0, 0, 255))
+        # for landmark in lm[27 : 36, :2]:
+        #     landmark_x, landmark_y = landmark
+        #     draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(0, 0, 255))
 
-        for landmark in lm[48 : 68, :2]:
-            landmark_x, landmark_y = landmark
-            draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(0, 255, 0))
+        # for landmark in lm[48 : 68, :2]:
+        #     landmark_x, landmark_y = landmark
+        #     draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(0, 255, 0))
 
-        for landmark in lm[17 : 27, :2]:
-            landmark_x, landmark_y = landmark
-            draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(0, 0, 0))
+        # for landmark in lm[17 : 27, :2]:
+        #     landmark_x, landmark_y = landmark
+        #     draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(0, 0, 0))
         
-        for landmark in lm_chin:
-            landmark_x, landmark_y = landmark
-            draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(127, 127, 127))
+        # for landmark in lm_chin:
+        #     landmark_x, landmark_y = landmark
+        #     draw.ellipse((landmark_x - 2, landmark_y - 2, landmark_x + 2, landmark_y + 2), fill=(127, 127, 127))
         
+        main_landmarks = np.vstack([eye_left, eye_right, mouth_avg])
+        dst_file_name = dst_file.split('.')[0]
+        # img.save(f'{dst_file_name}_original.jpg', 'PNG')
 
         # Shrink.
         shrink = int(np.floor(qsize / output_size * 0.5))
@@ -82,6 +88,7 @@ def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_s
             img = img.resize(rsize, PIL.Image.ANTIALIAS)
             quad /= shrink
             qsize /= shrink
+            main_landmarks /= shrink
 
         # Crop.
         border = max(int(np.rint(qsize * 0.1)), 3)
@@ -90,6 +97,7 @@ def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_s
         if crop[2] - crop[0] < img.size[0] or crop[3] - crop[1] < img.size[1]:
             img = img.crop(crop)
             quad -= crop[0:2]
+            main_landmarks -= crop[0:2]
 
         # Pad.
         pad = (int(np.floor(min(quad[:,0]))), int(np.floor(min(quad[:,1]))), int(np.ceil(max(quad[:,0]))), int(np.ceil(max(quad[:,1]))))
@@ -105,14 +113,48 @@ def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_s
             img += (np.median(img, axis=(0,1)) - img) * np.clip(mask, 0.0, 1.0)
             img = PIL.Image.fromarray(np.uint8(np.clip(np.rint(img), 0, 255)), 'RGB')
             quad += pad[:2]
+            main_landmarks += pad[0:2]
 
+        quad = quad + 0.5
         # Transform.
-        img = img.transform((transform_size, transform_size), PIL.Image.QUAD, (quad + 0.5).flatten(), PIL.Image.BILINEAR)
+
+        img = img.transform((transform_size, transform_size), PIL.Image.QUAD, quad.flatten(), PIL.Image.BILINEAR)
+        H = compute_h_norm(np.array([quad[0], quad[3], quad[2], quad[1]]), np.array([[0, 0], [transform_size, 0], [transform_size, transform_size], [0, transform_size]]))
+        H_inverse = np.linalg.inv(H)
+
+        warped_homogenous_landmarks = H_inverse @ np.concatenate((main_landmarks, np.ones((3, 1))), axis=1).T
+        warped_landmarks = (warped_homogenous_landmarks / warped_homogenous_landmarks[2])[:2].T
+
         if output_size < transform_size:
             img = img.resize((output_size, output_size), PIL.Image.ANTIALIAS)
 
-        # Save aligned image.
-        img.save(dst_file, 'PNG')
+        # Re-Scaling
+        left_eye, right_eye, mouth = warped_landmarks
+        eye_to_eye_length = np.linalg.norm(right_eye - left_eye)
+        avg_eye_to_mouth_length = np.linalg.norm(mouth - (left_eye + right_eye)*0.5)
+
+        # img.save(dst_file, 'PNG')
+
+        if eye_to_eye_length > avg_eye_to_mouth_length:
+            w, h = img.size
+            center_height = (right_eye[1] + left_eye[1])*0.5
+            ratio = eye_to_eye_length / avg_eye_to_mouth_length
+
+            img = img.resize((output_size, int(ratio * output_size)), PIL.Image.BICUBIC)
+            img = img.crop((0, int(center_height * ratio - output_size * 0.5), w, int(center_height * ratio + output_size * 0.5)))
+            img.save(f'{dst_file_name}_resize.jpg', 'PNG')
+
+
+        else:
+            w, h = img.size
+            center_width = (right_eye[0] + left_eye[0])*0.5
+
+            ratio = avg_eye_to_mouth_length / eye_to_eye_length
+            img = img.resize((int(ratio * output_size), output_size), PIL.Image.BICUBIC)
+            img = img.crop((int(center_width * ratio - output_size * 0.5), 0, int(center_width * ratio + output_size * 0.5), h))
+
+            img.save(f'{dst_file_name}_resize.jpg', 'PNG')
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -122,15 +164,23 @@ if __name__ == "__main__":
     
     landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, flip_input=False)
 
+    available_images = os.listdir('datasets/align_test_cp/')
+    # images_candidates = os.listdir('datasets/danbooru2019_cp/')
+
+    # if not os.path.exists('datasets/danbooru2019_cp_align/'):
+            # os.makedirs('datasets/danbooru2019_cp_align/')
+    available_dict = {f"{image.split('_')[0]}.jpg": True for image in available_images}
+    
+
     images = os.listdir(args.dataset_dir)
-    for image_name in images:
-        image_path = os.path.join(args.dataset_dir, image_name)
-        landmarks = landmarks_detector.get_landmarks(image_path)
-        
-        if landmarks is None:
-            print('TT')
-        else:
-            print('GOOD')
-            for i, face_landmarks in enumerate(landmarks, start=1):
-                aligned_face_path = os.path.join(args.save_dir, image_name)
-                image_align(image_path, aligned_face_path, face_landmarks)
+    for image_name in tqdm(images):
+        if available_dict.get(image_name):
+            image_path = os.path.join(args.dataset_dir, image_name)
+            landmarks = landmarks_detector.get_landmarks(image_path)
+            
+            if landmarks is None:
+                pass
+            else:
+                for i, face_landmarks in enumerate(landmarks, start=1):
+                    aligned_face_path = os.path.join(args.save_dir, image_name)
+                    image_align(image_path, aligned_face_path, face_landmarks)
