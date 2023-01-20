@@ -20,7 +20,7 @@ class Visualizer:
             if not os.path.exists(self.train_log_dir):
                 os.makedirs(self.train_log_dir)
 
-            wandb.init(project=opt.wandb_project_name, name=opt.task_name, dir=self.train_log_dir)
+            wandb.init(project=opt.wandb_project_name, name=opt.task_name)
             wandb.config.update(opt)
 
             self.log_file = open(self.log_name,"a")
