@@ -35,6 +35,7 @@ parser.add_argument('--early_stop',action="store_true",help='')
 parser.add_argument('--scratch',action="store_true",help='')
 parser.add_argument('--train_tgt_root', help='TTN target domain train dataset directory')
 parser.add_argument('--val_tgt_root', help='TTN target domain validation dataset directory')
+parser.add_argument('--root', help='CCN dataset directory')
 
 
 #---------path set--------------------------------------

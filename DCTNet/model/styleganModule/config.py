@@ -4,9 +4,8 @@ class Params:
         self.name = 'StyleGAN'
         self.network_name = 'CCN'
 
-        self.stylegan_path = 'pretrain_models/stylegan2-ffhq-config-f.pt'
-        self.root = 'datasets/limjukyung_aligned'
-        self.id_model = 'pretrain_models/model_ir_se50.pth'
+        self.stylegan_path = 'DCTNet/pretrain_models/stylegan2-ffhq-config-f.pt'
+        self.id_model = 'DCTNet/pretrain_models/model_ir_se50.pth'
         self.g_reg_every = 4 
         self.d_reg_every = 16
         self.D_steps_pre_G = 1
