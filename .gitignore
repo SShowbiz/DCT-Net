@@ -210,6 +210,9 @@ checkpoints
 *.pth
 *.pt
 
+# log
+wandb
+
 # SSFHS
 .DS_Store
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,python
