@@ -40,10 +40,10 @@ parser.add_argument('--id_model', default='pretrain_models/model_ir_se50.pth', h
 
 parser.add_argument('--train_tgt_root', help='TTN target domain train dataset directory')
 parser.add_argument('--val_tgt_root', help='TTN target domain validation dataset directory')
-parser.add_argument('--train_src_root', default='datasets/img_ffhq', help='TTN source domain train dataset directory')
-parser.add_argument('--val_src_root', default='datasets/img_ffhq_val', help='TTN source domain validation dataset directory')
-parser.add_argument('--vgg_model', default='pretrain_models/vgg19-dcbb9e9d.pth', help='vgg loss pretrained model checkpoint path')
-parser.add_argument('--score_info', default='pretrain_models/all_express_mean.npy', help='face perception loss expression data path')
+parser.add_argument('--train_src_root', default='DCTNet/datasets/img_ffhq', help='TTN source domain train dataset directory')
+parser.add_argument('--val_src_root', default='DCTNet/datasets/img_ffhq_val', help='TTN source domain validation dataset directory')
+parser.add_argument('--vgg_model', default='DCTNet/pretrain_models/vgg19-dcbb9e9d.pth', help='vgg loss pretrained model checkpoint path')
+parser.add_argument('--score_info', default='DCTNet/pretrain_models/all_express_mean.npy', help='face perception loss expression data path')
 
 #---------path set--------------------------------------
 parser.add_argument('--checkpoint_path',default='checkpoint-onlybaby',type=str)
