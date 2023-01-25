@@ -26,7 +26,9 @@ class ModelTrainer:
             self.vis = Visualizer(args)
 
             if args.eval:
-                self.val_vis = Visualizer(args,"val")
+                self.val_vis = Visualizer(args, "val")
+                self.test_vis = Visualizer(args, "test")
+                
         self.network_name = args.network_name
         self.labels =  dict(CCN=['DATA', 'FAKE_S', 'FAKE_T'], TTN=['SOURCE', 'GENERATED', 'TARGET'])[args.network_name]
 

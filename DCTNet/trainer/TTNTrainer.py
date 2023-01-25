@@ -11,9 +11,17 @@ from model.Pix2PixModule.model import Generator,Discriminator,ExpressDetector
 from utils.utils import *
 from model.Pix2PixModule.module import *
 from model.Pix2PixModule.loss import *
+from inference import Infer
 import torch.distributed as dist 
 import random
 import itertools
+import os
+from PIL import Image
+from torchvision import transforms 
+
+TEST_TRANSFORM = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 class TTNTrainer(ModelTrainer):
 
@@ -57,7 +65,8 @@ class TTNTrainer(ModelTrainer):
             self.netSfD_module = self.netSfD
             if args.use_exp:
                 self.ExpG_module = self.ExpG
-           
+
+        self.test_root = args.test_root
 
         self.VggLoss = VGGLoss(args.vgg_model).to(self.device).eval()
         self.TVLoss = TVLoss(1).to(self.device).eval()
@@ -186,6 +195,21 @@ class TTNTrainer(ModelTrainer):
                 if i == index and self.args.rank == 0 :
                     self.val_vis.display_current_results(self.select_img([xs,xg]), steps, mode=f'{self.network_name}_EVAL', labels=['SOURCE', 'GENERATED'])
                 counter += 1
+            
+            test_sources = []
+            test_generated = []
+            for test_image_name in os.listdir(self.test_root):
+                image_path = os.path.join(self.test_root, test_image_name)
+
+                img = Image.open(image_path)
+                xs = TEST_TRANSFORM(img).unsqueeze(0).cuda()
+                xg = self.netG(xs)
+                
+                test_sources.append(xs)
+                test_generated.append(xg)
+            
+            test_images = list(zip(test_sources, test_generated))
+            self.test_vis.display_current_results(test_images, steps, mode=f'{self.network_name}_TEST', labels=['SOURCE', 'GENERATED'])
         
        
         for key,val in loss_dict.items():
