@@ -57,10 +57,6 @@ class Visualizer:
         elif mode.endswith('EVAL'):
             vis_images = [wandb.Image(images, caption=' / '.join(labels)) for images in visuals]
         else:
-            for xs, xg in visuals:
-                print(xs.shape)
-                print(xg.shape)
-                print(torch.cat([xs, xg], dim=0).shape)
             vis_images = [wandb.Image(torch.cat([xs, xg], dim=0), caption=' / '.join(labels)) for xs, xg in visuals]
 
         wandb.log({mode: vis_images}, step=step)
