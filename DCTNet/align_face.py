@@ -9,7 +9,7 @@ import face_alignment
 from warp import compute_h_norm
 import torch
 from PIL import Image, ImageDraw
-import tqdm
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_dir', default="datasets/arcane/")
