@@ -130,28 +130,36 @@ def image_align(src_file, dst_file, face_landmarks, output_size=1024, transform_
 
         # Re-Scaling
         left_eye, right_eye, mouth = warped_landmarks
-        eye_to_eye_length = np.linalg.norm(right_eye - left_eye)
-        avg_eye_to_mouth_length = np.linalg.norm(mouth - (left_eye + right_eye)*0.5)
+        eye_to_eye = right_eye - left_eye
+        mouth_to_eye = mouth - (left_eye + right_eye)*0.5
 
-        # img.save(dst_file, 'PNG')
+        eye_to_eye_length = np.linalg.norm(eye_to_eye)
+        avg_eye_to_mouth_length = np.linalg.norm(mouth_to_eye)
 
-        if eye_to_eye_length > avg_eye_to_mouth_length:
+        if eye_to_eye_length*4 > avg_eye_to_mouth_length*3.6:
             w, h = img.size
-            center_height = (right_eye[1] + left_eye[1])*0.5
-            ratio = eye_to_eye_length / avg_eye_to_mouth_length
+            center_height = (right_eye[1] + left_eye[1])*0.5 + mouth_to_eye[1] * 0.1
+            ratio = (eye_to_eye_length*4.0) / (avg_eye_to_mouth_length*3.6)
+            _, eye_to_mouth_y = abs(mouth_to_eye)
 
-            img = img.resize((output_size, int(ratio * output_size)), PIL.Image.BICUBIC)
-            img = img.crop((0, int(center_height * ratio - output_size * 0.5), w, int(center_height * ratio + output_size * 0.5)))
+            scale_factor = eye_to_mouth_y / avg_eye_to_mouth_length * ratio
+
+            img = img.resize((output_size, int(scale_factor * output_size)), PIL.Image.BICUBIC)
+            img = img.crop((0, int(center_height * scale_factor - output_size * 0.5), w, int(center_height * scale_factor + output_size * 0.5)))
             img.save(f'{dst_file_name}_resize.jpg', 'PNG')
 
 
         else:
             w, h = img.size
-            center_width = (right_eye[0] + left_eye[0])*0.5
+            center_width = (right_eye[0] + left_eye[0])*0.5 + mouth_to_eye[0] * 0.1
+            ratio = (avg_eye_to_mouth_length*3.6) / (eye_to_eye_length*4.0)
+            eye_to_eye_x, _ = abs(eye_to_eye)
 
-            ratio = avg_eye_to_mouth_length / eye_to_eye_length
-            img = img.resize((int(ratio * output_size), output_size), PIL.Image.BICUBIC)
-            img = img.crop((int(center_width * ratio - output_size * 0.5), 0, int(center_width * ratio + output_size * 0.5), h))
+            scale_factor = eye_to_eye_x / eye_to_eye_length * ratio
+
+
+            img = img.resize((int(scale_factor * output_size), output_size), PIL.Image.BICUBIC)
+            img = img.crop((int(center_width * scale_factor - output_size * 0.5), 0, int(center_width * scale_factor + output_size * 0.5), h))
 
             img.save(f'{dst_file_name}_resize.jpg', 'PNG')
 
