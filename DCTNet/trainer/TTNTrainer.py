@@ -11,7 +11,6 @@ from model.Pix2PixModule.model import Generator,Discriminator,ExpressDetector
 from utils.utils import *
 from model.Pix2PixModule.module import *
 from model.Pix2PixModule.loss import *
-from inference import Infer
 import torch.distributed as dist 
 import random
 import itertools
