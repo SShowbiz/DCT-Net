@@ -7,7 +7,7 @@ from utils.utils import convert_img
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', default="1")
+parser.add_argument('--ckpt')
 parser.add_argument('--img_path', default="webtoonme_sample")
 
 
@@ -41,6 +41,7 @@ class Infer:
         if torch.cuda.is_available():
             img = img.cuda()
         return img
+        
     def postprocess(self,img):
         img = convert_img(img,unit=True)
         return img.permute(1,2,0).cpu().numpy()[...,::-1]
@@ -54,9 +55,7 @@ if __name__ == "__main__":
     for image_name in images:
         img_name = image_name.split('/')[-1].split('.')[0]
         image_path = os.path.join(args.img_path, image_name)
-
-        path = f'checkpoints/TTN/limjukyung_siggraph_checkpoint/Pix2Pix/{args.epoch.zfill(3)}-00000000.pth'
-        model = Infer(path)
+        model = Infer(args.ckpt)
 
         img = cv2.imread(image_path)
 
