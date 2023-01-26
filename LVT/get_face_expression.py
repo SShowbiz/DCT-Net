@@ -141,8 +141,8 @@ if __name__ == "__main__":
 
             mx_lip_all = max(mx_lip_all,mx_lip)
             mn_lip_all = min(mn_lip_all,mn_lip)
-        os.makedirs('../pretrain_models',exist_ok=True)
-        np.save('../pretrain_models/all_express_mean.npy',[mx_left_eye_all,mn_left_eye_all,
+        os.makedirs('../DCTNet/pretrain_models',exist_ok=True)
+        np.save('../DCTNet/pretrain_models/all_express_mean.npy',[mx_left_eye_all,mn_left_eye_all,
                                         mx_right_eye_all,mn_right_eye_all,
                                         mx_lip_all,mn_lip_all])
         
