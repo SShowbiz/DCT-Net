@@ -13,7 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist 
 import subprocess
 from utils.utils import convert_img
-from tqdm import tqdm
+# from tqdm import tqdm
 
 class ModelTrainer:
 
@@ -51,10 +51,10 @@ class ModelTrainer:
             print("current steps: %d | one epoch steps: %d "%(steps,self.args.mx_data_length))
 
         for epoch in range(begin_it+1,self.args.max_epoch):
-            progress = tqdm(train_loader)
-            progress.set_description(f"Epoch: {epoch:03d}")
+            # progress = tqdm(train_loader)
+            # progress.set_description(f"Epoch: {epoch:03d}")
 
-            for ii,(data) in enumerate(progress):
+            for ii,(data) in enumerate(train_loader):
                 tstart = time.time()
                 
                 self.run_single_step(data,steps)
