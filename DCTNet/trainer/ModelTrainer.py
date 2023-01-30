@@ -56,60 +56,58 @@ class ModelTrainer:
 
             for ii,(data) in enumerate(train_loader):
                 tstart = time.time()
-                
                 self.run_single_step(data,steps)
-                losses = self.get_latest_losses()
+                
+                if epoch % 10 == 0:
+                    losses = self.get_latest_losses()
 
-                for key,val in losses.items():
-                    loss_dict[key] = loss_dict.get(key,0) + val.mean().item()
+                    for key,val in losses.items():
+                        loss_dict[key] = loss_dict.get(key,0) + val.mean().item()
 
-                counter += 1
-                steps += 1
+                    counter += 1
+                    steps += 1
+                    telapsed = time.time() - tstart
 
-                telapsed = time.time() - tstart
-
-
-                if ii % self.args.print_interval == 0 and self.args.rank == 0:
-                    for key,val in loss_dict.items():
-                        loss_dict[key] /= counter
-                   
-                    lr_rate = self.get_lr()
-                    print_dict = {**{"time":telapsed,"lr":lr_rate},
-                                    **loss_dict}
-                    self.vis.print_current_errors(epoch,ii,print_dict,telapsed)
+                    if ii % self.args.print_interval == 0 and self.args.rank == 0:
+                        for key,val in loss_dict.items():
+                            loss_dict[key] /= counter
                     
-                    self.vis.plot_current_errors(print_dict,steps)
-                    
-                    loss_dict = {}
-                    counter = 0
-                    
-                    # torch.cuda.empty_cache()
-                if self.args.save_interval != 0 and ii % self.args.save_interval == 0 and \
-                    self.args.rank == 0:
-                    self.saveParameters(os.path.join(self.args.checkpoint_path,"%03d-%08d.pth"%(epoch,ii)))
-                    
-                    display_data = self.select_img(self.get_latest_generated())
-
-                    self.vis.display_current_results(display_data, steps, mode=f'{self.network_name}_TRAIN', labels=self.labels)
-            
-
-
-                if self.args.eval and self.args.test_interval > 0 and steps % self.args.test_interval == 0:
-                    val_loss = self.evalution(test_loader,steps,epoch)
-
-                    if self.args.early_stop:
+                        lr_rate = self.get_lr()
+                        print_dict = {**{"time":telapsed,"lr":lr_rate},
+                                        **loss_dict}
+                        self.vis.print_current_errors(epoch,ii,print_dict,telapsed)
+                        self.vis.plot_current_errors(print_dict,steps)
                         
-                        acc_num,mn_loss,stop_flag = self.early_stop_wait(self.get_loss_from_val(val_loss),acc_num,mn_loss,epoch)
-                        if stop_flag:
-                            return 
+                        loss_dict = {}
+                        counter = 0
+                        
+                        # torch.cuda.empty_cache()
+                    if self.args.save_interval != 0 and ii % self.args.save_interval == 0 and \
+                        self.args.rank == 0:
+                        self.saveParameters(os.path.join(self.args.checkpoint_path,"%03d-%08d.pth"%(epoch,ii)))
+                        
+                        display_data = self.select_img(self.get_latest_generated())
+
+                        self.vis.display_current_results(display_data, steps, mode=f'{self.network_name}_TRAIN', labels=self.labels)
+                
+
+
+                    if self.args.eval and self.args.test_interval > 0 and steps % self.args.test_interval == 0:
+                        val_loss = self.evalution(test_loader,steps,epoch)
+
+                        if self.args.early_stop:
+                            
+                            acc_num,mn_loss,stop_flag = self.early_stop_wait(self.get_loss_from_val(val_loss),acc_num,mn_loss,epoch)
+                            if stop_flag:
+                                return 
        
                 # print('******************memory:',psutil.virtual_memory()[3])
 
-            if self.args.rank == 0 :
+            if epoch % 10 == 0 and self.args.rank == 0:
                 self.saveParameters(os.path.join(self.args.checkpoint_path,"%03d-%08d.pth"%(epoch,0)))
 
             # 验证，保存最优模型
-            if test_loader or self.args.eval:
+            if epoch % 10 == 0 and test_loader or self.args.eval:
                 val_loss = self.evalution(test_loader,steps,epoch)
 
                 if self.args.early_stop:
