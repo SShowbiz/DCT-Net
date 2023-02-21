@@ -36,7 +36,7 @@ class TTNData(DatasetBase):
                 ),
                 #                 A.RandomBrightnessContrast(brightness_limit=[-0, 0.2], contrast_limit=[0.5, 1], p=0.5),
                 A.Perspective(scale=(0.09, 0.1), p=0.5),
-                A.CenterCrop(256, 256),
+                A.CenterCrop(512, 512),
                 A.Normalize(
                     mean=(0.5, 0.5, 0.5),
                     std=(0.5, 0.5, 0.5),
