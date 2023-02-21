@@ -30,7 +30,7 @@ class TTNData(DatasetBase):
 
         self.transform = A.Compose(
             [
-                A.SmallestMaxSize(max_size=512),
+                A.SmallestMaxSize(max_size=256),
                 A.ShiftScaleRotate(
                     shift_limit=0.2, scale_limit=[-0.6, 0.2], rotate_limit=30, p=0.5
                 ),
@@ -54,7 +54,7 @@ class TTNData(DatasetBase):
             # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
             self.transform = A.Compose(
                 [
-                    A.SmallestMaxSize(max_size=512),
+                    A.SmallestMaxSize(max_size=256),
                     A.Normalize(
                         mean=(0.5, 0.5, 0.5),
                         std=(0.5, 0.5, 0.5),
