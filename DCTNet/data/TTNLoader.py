@@ -54,7 +54,7 @@ class TTNData(DatasetBase):
             # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
             self.transform = A.Compose(
                 [
-                    A.SmallestMaxSize(max_size=512),
+                    A.SmallestMaxSize(max_size=256),
                     A.Normalize(
                         mean=(0.5, 0.5, 0.5),
                         std=(0.5, 0.5, 0.5),
