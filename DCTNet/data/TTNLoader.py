@@ -32,7 +32,7 @@ class TTNData(DatasetBase):
             [
                 A.SmallestMaxSize(max_size=512),
                 A.ShiftScaleRotate(
-                    shift_limit=0.2, scale_limit=[-0.8, 0.2], rotate_limit=30, p=0.5
+                    shift_limit=0.2, scale_limit=[-0.8, 0.1], rotate_limit=30, p=0.5
                 ),
                 #                 A.RandomBrightnessContrast(brightness_limit=[-0, 0.2], contrast_limit=[0.5, 1], p=0.5),
                 A.Perspective(scale=(0.09, 0.1), p=0.5),
