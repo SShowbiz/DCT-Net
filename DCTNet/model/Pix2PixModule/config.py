@@ -3,7 +3,6 @@ class Params:
         self.name = "Pix2Pix"
         self.network_name = "TTN"
 
-        self.lr = 1e-4
         self.beta1 = 0.5
         self.beta2 = 0.99
 
