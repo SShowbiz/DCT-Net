@@ -9,7 +9,7 @@ class Params:
         self.use_exp = True
         self.lambda_surface = 2.0
         self.lambda_texture = 2.0
-        self.lambda_content = 200
+        self.lambda_content = 150
         self.lambda_tv = 1e4
 
         self.lambda_exp = 1.0
